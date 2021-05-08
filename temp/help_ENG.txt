@@ -7,3 +7,4 @@ You can attack a number using the ➜ * Attack number * button. The button is at
 4) Certain numbers may not respond to services.
 
 /usd - Find out the dollar rate 💵
+/msg - Send message (Example: /msg Hello)
