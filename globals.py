@@ -1,0 +1,52 @@
+import asyncio
+import sqlite3
+from config.config import Config
+from loguru import logger
+from aiogram import Bot
+from db_models.User import engine, all_users_table, data_users_table
+from aiogram import Dispatcher
+from sites import Bomber
+
+#-_-_-_-_-CONNECTS-_-_-_-_-
+try:
+    config = Config() #Config load
+    logger.info("[+] True loaded configuration")
+except Exception as e:
+    logger.exception(e)
+
+try:
+    bot = Bot(token = config.token, parse_mode="html") #connect t0 Telegram API
+    dp:Dispatcher = None
+    logger.info("[+] True connect to Telegram API")
+except Exception as e:
+    logger.exception(e)
+
+conn = engine.connect()
+#-_-_-_-_-_-END-_-_-_-_-_-
+
+#-_-_-_-_-VARIABLES -_-_-_-_-
+bot_info:dict = None #Bot information
+
+seconds:int = 0      #Counter variable
+start_attack:Bomber = None
+now_process:bool = True #Process T/F
+attack_country:str = None
+
+mail_button = None
+mail_content:str = None
+mail_count:int = 0
+#-_-_-_-_-_-END-_-_-_-_-_-
+
+#-_-_-_-_-KEYBOARDS-_-_-_-_-
+ru_keyboards:list = [
+    ["👤Мой профиль"], 
+    ["💣Атаковать номер"],
+    ["🌐Изменить язык"]
+]
+
+eng_keyboards:list = [
+    ["👤My profile"], 
+    ["💣Attack number"], 
+    ["🌐Change the language"]
+]
+#-_-_-_-_-_-END-_-_-_-_-_-

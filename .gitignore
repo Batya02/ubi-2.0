@@ -1,0 +1,7 @@
+database/
+config/
+include/
+Lib/
+Scripts/
+debug/
+pyvenv.cfg
