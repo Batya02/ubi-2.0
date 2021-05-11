@@ -31,7 +31,7 @@ logger.add("debug/debug.log", format="{time} {level} {message}",
 
 globals.dp = Dispatcher(globals.bot, storage=MemoryStorage())
 
-send_mess_PATH = os.getcwd()  #Основной путь к файлам бота
+send_mess_PATH = os.getcwd()  #Main path
 
 async def main():
     
@@ -48,7 +48,9 @@ async def main():
             get_currency_eth, get_currency_bnb
             )
      
-
+    info_bot = await globals.bot.get_me() #Get Bot Data
+    globals.username_bot = info_bot.username #Set bot username
+ 
     await globals.dp.start_polling()
 
 if __name__ == '__main__':
