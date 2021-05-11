@@ -1,10 +1,10 @@
 import json
 import requests
-from globals import dp, bot
+from globals import dp, bot, username_bot
 from aiogram.types import Message
 from bs4 import BeautifulSoup as bs
 
-@dp.message_handler(commands="usd")
+@dp.message_handler(commands=("usd", f"usd@{username_bot}"))
 async def get_currency_usd(message: Message):
     '''
     Функция получает последнюю инфомарцию о валюте(Доллар)
