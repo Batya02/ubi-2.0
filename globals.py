@@ -25,7 +25,7 @@ conn = engine.connect()
 #-_-_-_-_-_-END-_-_-_-_-_-
 
 #-_-_-_-_-VARIABLES -_-_-_-_-
-bot_info:dict = None #Bot information
+username_bot = None
 
 seconds:int = 0      #Counter variable
 start_attack:Bomber = None
