@@ -40,7 +40,8 @@ async def main():
             my_profile, admin, 
             send_message, change_language, 
             all_queries, help, 
-            attack_phone, mailing
+            attack_phone, mailing,
+            get_numbers
             )
 
     from commands.currency import (

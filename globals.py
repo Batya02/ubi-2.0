@@ -25,7 +25,8 @@ conn = engine.connect()
 #-_-_-_-_-_-END-_-_-_-_-_-
 
 #-_-_-_-_-VARIABLES -_-_-_-_-
-username_bot = None
+username_bot:str = None #Username bot
+data_numbers_kv:dict = None #All public numbers
 
 seconds:int = 0      #Counter variable
 start_attack:Bomber = None
@@ -41,7 +42,8 @@ mail_count:int = 0
 ru_keyboards:list = [
     ["👤Мой профиль"], 
     ["💣Атаковать номер"],
-    ["🌐Изменить язык"]
+    ["🌐Изменить язык"],
+    ["📲Купить виртуальный номер"]
 ]
 
 eng_keyboards:list = [

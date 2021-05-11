@@ -108,7 +108,8 @@ async def eng_attack_phone(message: Message):
         "/msg", "/help",
          "/usd", "/btc", 
          "/bnb", "/eth", 
-         "/stat", "/mail"))
+         "/stat", "/mail", 
+         "📲Купить виртуальный номер"))
          )
 async def take_phone(message: Message):
     phone = re.sub("[^0-9]", "", message.text)
