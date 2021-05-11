@@ -11,10 +11,6 @@ async def get_currency_eth(message: Message):
     '''
 
     try:
-        await bot.delete_message(message.chat.id, message.message_id)
-    except:await bot.delete_message(message.from_user.id, message.message_id)
-
-    try:
         eth_url = requests.get(timeout=0.5, url=
         "https://www.binance.com/en/trade/ETH_USDT")
         eth_soup = str(bs(eth_url.text, "html.parser").find(id="__APP_DATA"))

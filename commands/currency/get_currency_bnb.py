@@ -9,10 +9,6 @@ async def get_currency_bnb(message: Message):
     '''
     Функция получает последнюю инфомарцию о валюте(Доллар)
     '''
-
-    '''try:
-        await bot.delete_message(message.chat.id, message.message_id)
-    except:await bot.delete_message(message.from_user.id, message.message_id)'''
     
     try:
         bnb_url = requests.get(timeout=0.5, url=

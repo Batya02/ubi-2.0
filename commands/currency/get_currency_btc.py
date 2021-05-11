@@ -11,10 +11,6 @@ async def get_currency_btc(message: Message):
     '''
 
     try:
-        await bot.delete_message(message.chat.id, message.message_id)
-    except:await bot.delete_message(message.from_user.id, message.message_id)
-
-    try:
         btc_url = requests.get(timeout=0.5, url=
         "https://www.binance.com/en/trade/BTC_USDT")
         btc_soup = str(bs(btc_url.text, "html.parser").find(id="__APP_DATA"))
