@@ -69,6 +69,7 @@ class Bomber:
                         status=self.state_seconds
                     ).where(data_users_table.c.user_id==chat_id)
                     globals.conn.execute(update_data)
+                    
                     await message.answer(
                             text=f"⌛️Круги исчерпаны...")
                     return await self.session.close()
@@ -81,7 +82,6 @@ class Bomber:
                     ).where(data_users_table.c.user_id==chat_id)
                 globals.conn.execute(update_data)
 
-                globals.sql.commit()
                 await message.answer(
                         text=f"⌛️Превышено время атаки... Не забывайте отключать атаку!\n"
                         f"⚙️Влияет на нагрузку памяти и процессора!")
