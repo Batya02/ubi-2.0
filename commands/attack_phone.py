@@ -115,6 +115,7 @@ async def eng_attack_phone(message: Message):
          "📲Купить виртуальный номер"))
          )
 async def take_phone(message: Message):
+    print(message.chat.id)
     if not message.chat.id in cfg.super_groups:
         phone = re.sub("[^0-9]", "", message.text)
 
