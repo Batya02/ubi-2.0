@@ -5,6 +5,7 @@ from datetime import datetime as dt
 import globals
 from sites import Bomber
 from globals import dp, conn, data_users_table
+from config import config
 
 from sqlalchemy import select
 
@@ -15,6 +16,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 class Attack_Start(StatesGroup):
     take_phone_func = State()
+
+cfg = config.Config()
 
 @dp.message_handler(lambda message: message.text == "💣Атаковать номер")
 async def ru_attack_phone(message: Message):
@@ -112,35 +115,36 @@ async def eng_attack_phone(message: Message):
          "📲Купить виртуальный номер"))
          )
 async def take_phone(message: Message):
-    phone = re.sub("[^0-9]", "", message.text)
+    if not message.chat.id in cfg.super_groups:
+        phone = re.sub("[^0-9]", "", message.text)
 
-    if phone.startswith("7") or phone.startswith("8"):
-        phone = f"7{phone[1:]}"
-        globals.attack_country = "ru"
+        if phone.startswith("7") or phone.startswith("8"):
+            phone = f"7{phone[1:]}"
+            globals.attack_country = "ru"
 
-    elif phone.startswith("38"):
-        globals.attack_country = "uk"
-        
-    else:
-        return await message.answer("🔁Не удалось определить страну. Проверьте номер на корректность!", reply=True)
+        elif phone.startswith("38"):
+            globals.attack_country = "uk"
+            
+        else:
+            return await message.answer("🔁Не удалось определить страну. Проверьте номер на корректность!", reply=True)
 
-    date = dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S")
+        date = dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S")
 
-    update_data = data_users_table.update().values(
-            last_phone=phone, last_date=date
-    ).where(data_users_table.c.user_id==message.from_user.id)
-    conn.execute(update_data)
+        update_data = data_users_table.update().values(
+                last_phone=phone, last_date=date
+        ).where(data_users_table.c.user_id==message.from_user.id)
+        conn.execute(update_data)
 
-    usl = InlineKeyboardMarkup(
-            inline_keyboard = [
-                    [InlineKeyboardButton(
-                            text="⏹Остановить", callback_data=f"Остановить_{message.from_user.id}")]
-            ])
+        usl = InlineKeyboardMarkup(
+                inline_keyboard = [
+                        [InlineKeyboardButton(
+                                text="⏹Остановить", callback_data=f"Остановить_{message.from_user.id}")]
+                ])
 
-    await message.answer(
-            text="▶️Атака началась!\nНажмите кнопку для остановки атаки.", 
-            reply_markup = usl
-            )
+        await message.answer(
+                text="▶️Атака началась!\nНажмите кнопку для остановки атаки.", 
+                reply_markup = usl
+                )
 
-    globals.start_attack = Bomber(user_id=str(message.from_user.id))
-    await globals.start_attack.start(message.text, message.from_user.id)
+        globals.start_attack = Bomber(user_id=str(message.from_user.id))
+        await globals.start_attack.start(message.text, message.from_user.id)
