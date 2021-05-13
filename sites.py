@@ -116,7 +116,7 @@ class Bomber:
                     except:pass
                 
                 elif "params" in list(v.keys()) and not v["format"]:
-                    dct = v["json"]
+                    dct = v["params"]
                     dct[v["arg"]] = v["plus"]+phone
                     try:
                         async with self.session.post(
@@ -126,6 +126,7 @@ class Bomber:
                         ) as resp:pass
                         await asyncio.sleep(1)
                     except:pass
+                    
 
                 else:
                     url = v["url"].format(phone)
