@@ -70,7 +70,8 @@ class Bomber:
                     ).where(data_users_table.c.user_id==chat_id)
                     globals.conn.execute(update_data)
                     
-                    await message.answer(
+                    await globals.bot.send_message(
+                            chat_id,
                             text=f"⌛️Круги исчерпаны...")
                     return await self.session.close()
                     break
@@ -82,7 +83,8 @@ class Bomber:
                     ).where(data_users_table.c.user_id==chat_id)
                 globals.conn.execute(update_data)
 
-                await message.answer(
+                await globals.bot.send_message(
+                        chat_id,
                         text=f"⌛️Превышено время атаки... Не забывайте отключать атаку!\n"
                         f"⚙️Влияет на нагрузку памяти и процессора!")
                 await self.session.close()
