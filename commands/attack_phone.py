@@ -122,7 +122,9 @@ async def take_phone(message: Message):
             phone = f"7{phone[1:]}"
             globals.attack_country = "ru"
 
-        elif phone.startswith("38"):
+        elif phone.startswith("38") or phone.startswith("+38"):
+            arr_phone = phone.split("0")[1]
+            phone = f"38{arr_phone}"
             globals.attack_country = "uk"
             
         else:
