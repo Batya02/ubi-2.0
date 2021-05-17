@@ -7,11 +7,10 @@ You can attack a number using the ➜ *Attack number* button. The button is at t
 3) 1 circle - run the number by service.
 4) Certain numbers may not respond to services.
 
-You can buy a number using the button ➜ *Buy a virtual number*. The button is at the bottom
+You can buy a number using the button ➜ *Buy a virtual number*. The button is at the botton 👇
 
-/usd - Find out the dollar rate 
-/msg - Send message 
-(Example: /msg Hello)
+1) Prices are pulled from the site + 1₽ commission.
+2) You can generate a report of activated numbers. Report format: xlsx
 
 Main commands: 
 /start - Start bot
