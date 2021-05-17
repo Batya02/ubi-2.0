@@ -7,8 +7,7 @@ from aiogram.types import (
         InlineKeyboardButton)
 from aiogram.utils.exceptions import BotBlocked, UserDeactivated, ChatNotFound
 
-from db_models.User import all_users_table
-from sqlalchemy import select
+from db_models.User import User, session
 
 from datetime import datetime as dt
 from aiohttp import ClientSession
@@ -18,11 +17,10 @@ cfg = config.Config()
 @dp.callback_query_handler(lambda query: query.data.startswith(("change-lang")))
 async def ad_callback(query: CallbackQuery):
     change_data = query.data.replace("_", " ").split()
-    
-    update_data = all_users_table.update().values(
-            language=change_data[1]
-    ).where(all_users_table.c.user_id==change_data[2])
-    conn.execute(update_data)
+
+    changer = session.query(User).filter_by(user_id=change_data[2]).first()
+    changer.language = change_data[1]
+    session.commit()
 
     await bot.edit_message_text(
                 chat_id = query.message.chat.id, 
@@ -43,8 +41,8 @@ async def ad_callback(query: CallbackQuery):
 @dp.callback_query_handler(lambda query: query.data.startswith(("Остановить", "Stop")))
 async def stop_attack(query: CallbackQuery):
     user_id = query.data.replace("_", " ").split()[1]
-    language = select([all_users_table]).where(all_users_table.c.user_id==user_id)
-    language = conn.execute(language).fetchone()[3]
+
+    language = session.query(User).filter_by(user_id=user_id).first().language
     
     if language == "ENG": message = "✔️Attack stopped!"
     else: message = "✔️Атака остановлена!"
@@ -65,8 +63,7 @@ async def stop_attack(query: CallbackQuery):
 
 @dp.callback_query_handler(lambda query: query.data.startswith(("mail")))
 async def on_mailing(query: CallbackQuery):
-    all_users = select([all_users_table])
-    all_users = conn.execute(all_users).fetchall()
+    all_users = session.query(User).all()
 
     if query.data.split("_")[1] == "send":
         start_time = dt.utcnow()
@@ -103,10 +100,23 @@ async def on_mailing(query: CallbackQuery):
 
 @dp.callback_query_handler(lambda query: query.data.startswith(("num")))
 async def numbers_service(query: CallbackQuery):
-    service = query.data.replace("_", " ").split()[1]
+    service_name, service_price = query.data.replace("_", " ").split()[1:] #Service data (array)
 
+    my_balance = float(session.query(User.balance).filter_by(user_id=query.message.chat.id).first()[0])
+    new_balance = my_balance - float(service_price)
+    if new_balance < 0:
+        return await bot.send_message(
+            query.message.chat.id, 
+            text="Недостаточно средств на балансе!"
+        )
+    else:
+        update_balance = session.query(User).filter_by(user_id=query.message.chat.id).first()
+        update_balance.balance = new_balance
+        session.commit()
+
+    
     async with ClientSession() as session:
-        res = await session.get(f"http://{cfg.host_site_api}/stubs/handler_api.php?api_key={cfg.api_key}&action=getNumber&service={service}&operator=any&country=russia")
+        res = await session.get(f"http://{cfg.host_site_api}/stubs/handler_api.php?api_key={cfg.api_key}&action=getNumber&service={service_name}&operator=any&country=russia")
         res = await res.text()
         if res == "NO_NUMBERS":
             await query.answer(text="Номера отсутствуют!")
@@ -151,6 +161,3 @@ async def cancel_number(query: CallbackQuery):
         if res == "ACCESS_CANCEL":
             await query.answer(text="Номер успешно отменен.")
             await bot.delete_message(query.message.chat.id, query.message.message_id)
-
-
-    

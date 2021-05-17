@@ -4,7 +4,7 @@ from datetime import datetime as dt
 
 import globals
 from sites import Bomber
-from globals import dp, conn, data_users_table
+from globals import dp, conn
 from config import config
 
 from sqlalchemy import select
@@ -13,9 +13,7 @@ from aiogram.types import Message
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-
-class Attack_Start(StatesGroup):
-    take_phone_func = State()
+from db_models.User import session, DataUser
 
 cfg = config.Config()
 
@@ -32,18 +30,15 @@ async def ru_attack_phone(message: Message):
     Рускоязычные пользователи.
     '''
 
-    my_data = select([data_users_table]).where(data_users_table.c.user_id==message.from_user.id)
-    my_data = conn.execute(my_data).fetchone()
+    user_data = session.query(DataUser).filter_by(user_id=message.from_user.id).first()
 
-    if my_data == None:
-        date = dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S")
-
-        update_data = data_users_table.insert().values(
-                user_id=message.from_user.id, date=date, 
+    if user_data == None:
+        user_data = DataUser(
+                user_id=message.from_user.id, date=dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S"), 
                 status=30, last_phone="None", 
                 last_date="None"
         )
-        conn.execute(update_data)
+        session.commit()
 
         await message.answer(
                 f"📄Информация о последней атаке ➜\n\n"
@@ -51,15 +46,15 @@ async def ru_attack_phone(message: Message):
                 f"☎️Введите номер телефона жертвы(без +)⤵️", 
                 )
     else:
-        date  = dt.strptime(my_data[4], "%d-%m-%Y %H:%M:%S") if my_data[4] != "None" else "Неизвестно"
+        date  = dt.strptime(user_data.date, "%d-%m-%Y %H:%M:%S") if user_data.date != "None" else "Неизвестно" #Time
         date  = dt.strftime(date, "%d-%m-%Y %H:%M:%S") if date != "Неизвестно" else "Неизвестно"
-        phone = f"<code>{my_data[3]}</code>" if my_data[3] != "None" else "<b>Неизвестно</b>"
+        phone = f"<code>{user_data.last_phone}</code>" if user_data.last_phone != "None" else "<b>Неизвестно</b>"
         
         await message.answer(
                 f"📄Информация о последней атаке ➜\n\n"
                 f"🕰Время: <b>{date}</b>\n"
                 f"📌Номер: {phone}\n"
-                f"⏱Осталось кругов: <b>{my_data[2]}</b>\n\n"
+                f"⏱Осталось кругов: <b>{user_data.status}</b>\n\n"
                 f"☎️Введите номер телефона жертвы(без +)⤵️"
                 )
 
@@ -76,18 +71,15 @@ async def eng_attack_phone(message: Message):
     Англоязычные пользователи.
     '''
 
-    my_data = select([data_users_table]).where(data_users_table.c.user_id==message.from_user.id)
-    my_data = conn.execute(my_data).fetchone()
+    user_data = session.query(DataUser).filter_by(user_id=message.from_user.id).first()
 
-    if my_data == None:
-        date = dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S")
-
-        update_data = data_users_table.insert().values(
-                user_id=message.from_user.id, date=date, 
+    if user_data == None:
+        user_data = DataUser(
+                user_id=message.from_user.id, date=dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S"), 
                 status=30, last_phone="None", 
                 last_date="None"
         )
-        conn.execute(update_data)
+        session.commit()
 
         await message.answer(
                 f"📄Information about the last attack ➜\n\n"
@@ -95,15 +87,15 @@ async def eng_attack_phone(message: Message):
                 f"☎️Enter the victim's phone number (no +)⤵️", 
                 )
     else:
-        date  = dt.strptime(my_data[4], "%d-%m-%Y %H:%M:%S") if my_data[4] != "None" else "Unknown"
+        date  = dt.strptime(user_data.date, "%d-%m-%Y %H:%M:%S") if user_data.date != "None" else "Unknown"
         date  = dt.strftime(date, "%d-%m-%Y %H:%M:%S") if date != "Unknown" else "Unknown"
-        phone = f"<code>{my_data[3]}</code>" if my_data[3] != "None" else "<b>Unknown</b>"
+        phone = f"<code>{user_data.last_phone}</code>" if user_data.last_phone != "None" else "<b>Unknown</b>"
         
         await message.answer(
                 f"📄Information about the last attack ➜\n\n"
                 f"🕰Time: <b>{date}</b>\n"
                 f"📌Phone number: {phone}\n"
-                f"⏱Circles left: <b>{my_data[2]}</b>\n\n"
+                f"⏱Circles left: <b>{user_data.status}</b>\n\n"
                 f"☎️Enter the victim's phone number (no +)⤵️"
                 )
 
@@ -130,12 +122,12 @@ async def take_phone(message: Message):
         else:
             return await message.answer("🔁Не удалось определить страну. Проверьте номер на корректность!", reply=True)
 
-        date = dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S")
+        #Update data (last phone and last date)
+        update_data = session.query(DataUser).filter_by(user_id=message.from_user.id).first()
+        update_data.last_phone = phone
+        update_data.last_date = dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S")
 
-        update_data = data_users_table.update().values(
-                last_phone=phone, last_date=date
-        ).where(data_users_table.c.user_id==message.from_user.id)
-        conn.execute(update_data)
+        session.commit()
 
         usl = InlineKeyboardMarkup(
                 inline_keyboard = [

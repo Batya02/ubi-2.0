@@ -3,7 +3,7 @@ import sqlite3
 from config.config import Config
 from loguru import logger
 from aiogram import Bot
-from db_models.User import engine, all_users_table, data_users_table
+from db_models.User import engine
 from aiogram import Dispatcher
 from sites import Bomber
 

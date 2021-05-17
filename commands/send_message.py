@@ -1,7 +1,6 @@
 from globals import dp, conn, bot, config
 
 from sqlalchemy import select
-from db_models.User import all_users_table
 
 from aiogram.types import Message
 from aiogram.dispatcher.filters.state import StatesGroup, State
@@ -9,13 +8,15 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from commands import change_language, attack_phone
 from aiogram.utils.exceptions import ChatNotFound
 
+from db_models.User import session, User
+
 @dp.message_handler(commands=["msg"])
 async def ru_send_message(message: Message):
-    data = select([all_users_table]).where(all_users_table.c.user_id==message.from_user.id)
-    data = conn.execute(data).fetchone()
 
-    if data[3] == "ENG":message_form="📫Message sent successfully. Wait for an answer ..."
-    elif data[3] == "RU":message_form="📫Сообщение успешно отправлено. Ожидайте ответа ..."
+    data = session.query(User).filter_by(user_id=message.from_user.id).first() #My data
+
+    if data.language == "ENG":message_form="📫Message sent successfully. Wait for an answer ..."
+    elif data.language == "RU":message_form="📫Сообщение успешно отправлено. Ожидайте ответа ..."
     
     msg:str = message.text.replace("/msg", "").strip()
     if msg == "":
@@ -35,12 +36,12 @@ async def ru_send_message(message: Message):
         )
     else:
         user_id = message.reply_to_message.text.replace(":", " ").split()[1]
-        user_data = select([all_users_table]).where(all_users_table.c.user_id==user_id)
-        user_data = conn.execute(user_data).fetchone()
-        if user_data == None: return await message.answer("⚠️Нельзя пересылать сообщения!" if data[3] == "RU" else "⚠️No forwarding messages!")
+        user_data = session.query(User).filter_by(user_id=user_id).first() #Reply data
+
+        if user_data == None: return await message.answer("⚠️Нельзя пересылать сообщения!" if data.language == "RU" else "⚠️No forwarding messages!")
         await bot.send_message(
             user_id, 
-            text=f"📬Сообщение от админа: <code>{msg}</code>" if user_data[3] == "RU" else f"📬Message from admin: <code>{msg}</code>"
+            text=f"📬Сообщение от админа: <code>{msg}</code>" if user_data.language == "RU" else f"📬Message from admin: <code>{msg}</code>"
         )
 
         await bot.send_message(

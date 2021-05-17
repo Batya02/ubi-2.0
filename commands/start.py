@@ -3,7 +3,7 @@ from globals import dp, bot, conn, ru_keyboards, eng_keyboards
 from aiogram.types import Message
 
 from sqlalchemy import select
-from db_models.User import all_users_table
+from db_models.User import session, User
 
 from aiogram.types import (
         InlineKeyboardMarkup, InlineKeyboardButton, 
@@ -15,21 +15,17 @@ from datetime import datetime as dt
 @dp.message_handler(commands="start")
 async def start(message: Message):
 
-    data = select([all_users_table]).where(all_users_table.c.user_id==message.from_user.id)
-    data = conn.execute(data).fetchall()
+    data_user = session.query(User).filter_by(user_id=message.from_user.id).first()
+    
+    if data_user == None:
+        new_user = User(
+                user_id=message.from_user.id, username=message.from_user.username, 
+                date_registration=dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S"), language="None", 
+                balance="0.0"
 
-    if data == []:
-
-        date_reg = dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S")
-
-        insert_data = all_users_table.insert().values(
-            user_id=message.from_user.id, 
-            username=str(message.from_user.username), 
-            date_registration=date_reg, 
-            language="None"
         )
-
-        globals.conn.execute(insert_data)
+        session.add(new_user)
+        session.commit()
 
         lang_usl = InlineKeyboardMarkup(
             inline_keyboard=[
@@ -45,7 +41,7 @@ async def start(message: Message):
                     )
 
     else:
-        language = data[0][3]
+        language = data_user.language
 
         if language == "None":
             lang_usl = InlineKeyboardMarkup(

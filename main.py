@@ -23,7 +23,7 @@ from aiogram.types import (
         Message
         )
 
-from db_models.User import all_users_table, data_users_table
+#from db_models.User import session, User
 from sqlalchemy import select
 
 logger.add("debug/debug.log", format="{time} {level} {message}", 
@@ -32,6 +32,7 @@ logger.add("debug/debug.log", format="{time} {level} {message}",
 globals.dp = Dispatcher(globals.bot, storage=MemoryStorage())
 
 send_mess_PATH = os.getcwd()  #Main path
+
 
 async def main():
     
