@@ -1,30 +1,11 @@
 import os 
-import re
-import json
 import asyncio
-import sqlite3
 from loguru import logger
-from aiohttp import ClientSession
-from datetime import datetime as dt
 
-import commands
 import globals
-from sites import Bomber
-from config.config import Config
 
-from aiogram import Bot, types, Dispatcher
-from aiogram.utils import executor
-from aiogram.dispatcher.storage import FSMContext
+from aiogram import Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.types import ( 
-        ReplyKeyboardMarkup, KeyboardButton, 
-        InlineKeyboardMarkup, InlineKeyboardButton, 
-        Message
-        )
-
-#from db_models.User import session, User
-from sqlalchemy import select
 
 logger.add("debug/debug.log", format="{time} {level} {message}", 
     level="DEBUG", rotation="1 week", compression="zip")

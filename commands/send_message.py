@@ -1,14 +1,7 @@
-from globals import dp, conn, bot, config
-
-from sqlalchemy import select
+from globals import dp, bot, config
+from db_models.User import session, User
 
 from aiogram.types import Message
-from aiogram.dispatcher.filters.state import StatesGroup, State
-
-from commands import change_language, attack_phone
-from aiogram.utils.exceptions import ChatNotFound
-
-from db_models.User import session, User
 
 @dp.message_handler(commands=["msg"])
 async def ru_send_message(message: Message):

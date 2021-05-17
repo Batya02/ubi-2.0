@@ -2,9 +2,8 @@ import globals
 from config import config
 from globals import dp, bot, conn, eng_keyboards, ru_keyboards
 from aiogram.types import (
-        Message, CallbackQuery,
-        ReplyKeyboardMarkup, InlineKeyboardMarkup, 
-        InlineKeyboardButton)
+        CallbackQuery, ReplyKeyboardMarkup, 
+        InlineKeyboardMarkup, InlineKeyboardButton)
 from aiogram.utils.exceptions import BotBlocked, UserDeactivated, ChatNotFound
 
 from db_models.User import session, User, Orders

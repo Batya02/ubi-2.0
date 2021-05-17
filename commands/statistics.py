@@ -1,7 +1,6 @@
-import asyncio
 from aiogram.types import Message
-from globals import config, conn, dp
-from sqlalchemy import select
+
+from globals import config, dp
 from db_models.User import session, User, DataUser
 
 @dp.message_handler(commands="stat")

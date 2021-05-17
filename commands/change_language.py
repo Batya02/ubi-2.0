@@ -1,7 +1,5 @@
-from globals import dp, conn
+from globals import dp
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-
-from sqlalchemy import select
 
 @dp.message_handler(lambda message: message.text == "🌐Изменить язык" or message.text == "🌐Change the language")
 async def ru_send_message(message: Message):

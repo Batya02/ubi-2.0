@@ -1,5 +1,4 @@
 import re 
-import asyncio
 from datetime import datetime as dt
 
 import globals
@@ -10,7 +9,6 @@ from config import config
 from sqlalchemy import select
 
 from aiogram.types import Message
-from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from db_models.User import session, DataUser

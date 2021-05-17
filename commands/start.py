@@ -1,13 +1,9 @@
-import globals
-from globals import dp, bot, conn, ru_keyboards, eng_keyboards
-from aiogram.types import Message
-
-from sqlalchemy import select
+from globals import dp, ru_keyboards, eng_keyboards
 from db_models.User import session, User
 
 from aiogram.types import (
         InlineKeyboardMarkup, InlineKeyboardButton, 
-        ReplyKeyboardMarkup
+        ReplyKeyboardMarkup, Message
         )
 
 from datetime import datetime as dt

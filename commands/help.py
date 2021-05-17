@@ -1,7 +1,6 @@
 from globals import conn, dp
 from aiogram.types import Message
 
-from sqlalchemy import select
 from db_models.User import session, User
 
 @dp.message_handler(commands="help")

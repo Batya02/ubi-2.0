@@ -1,4 +1,4 @@
-from globals import dp, conn
+from globals import dp
 
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from db_models.User import session, User
