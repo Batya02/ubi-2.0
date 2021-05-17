@@ -15,7 +15,7 @@ async def start(message: Message):
     
     if data_user == None:
         new_user = User(
-                user_id=message.from_user.id, username=message.from_user.username, 
+                user_id=message.from_user.id, username=str(message.from_user.username), 
                 date_registration=dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S"), language="None", 
                 balance="0.0"
 
