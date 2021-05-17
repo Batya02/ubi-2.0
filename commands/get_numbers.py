@@ -32,6 +32,4 @@ async def get_numbers_list(message: Message):
         await message.answer(
             text="🇷🇺Выберите сервис👇", 
             reply_markup=numbers_markup
-        )     
-
-    
+        )        

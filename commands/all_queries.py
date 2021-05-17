@@ -101,7 +101,7 @@ async def on_mailing(query: CallbackQuery):
 @dp.callback_query_handler(lambda query: query.data.startswith(("num")))
 async def numbers_service(query: CallbackQuery):
     service_name, service_price = query.data.replace("_", " ").split()[1:] #Service data (array)
-
+    
     my_balance = float(session.query(User.balance).filter_by(user_id=query.message.chat.id).first()[0])
     new_balance = my_balance - float(service_price)
     if new_balance < 0:
@@ -114,12 +114,24 @@ async def numbers_service(query: CallbackQuery):
         update_balance.balance = new_balance
         session.commit()
 
-    
-    async with ClientSession() as session:
-        res = await session.get(f"http://{cfg.host_site_api}/stubs/handler_api.php?api_key={cfg.api_key}&action=getNumber&service={service_name}&operator=any&country=russia")
+    async with ClientSession() as client_session:
+        res = await client_session.get(f"http://{cfg.host_site_api}/stubs/handler_api.php?api_key={cfg.api_key}&action=getNumber&service={service_name}&operator=any&country=russia")
         res = await res.text()
+
+        #If not found numbers
         if res == "NO_NUMBERS":
             await query.answer(text="Номера отсутствуют!")
+
+        #If ended balance
+        elif res == "NO_BALANCE":
+            await bot.send_message(
+                cfg.chat_id, 
+                text=f"Нужно пополнить счет! https://{cfg.host_site_main}"
+            )
+
+            await query.answer(text="Неизвестная ошибка!")
+
+        #If all true
         else:
             res = res.split(":")
             status_number = res[0]
@@ -142,7 +154,7 @@ async def numbers_service(query: CallbackQuery):
             )
 
             while True:
-                get_id = await session.get(f"http://{cfg.host_site_api}/stubs/handler_api.php?api_key={cfg.api_key}&action=getStatus&id={id_number}")
+                get_id = await client_session.get(f"http://{cfg.host_site_api}/stubs/handler_api.php?api_key={cfg.api_key}&action=getStatus&id={id_number}")
                 get_id = await get_id.text()
                 if get_id == "STATUS_WAIT_CODE":pass
                 elif get_id.startswith(("STATUS_OK")):
