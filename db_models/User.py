@@ -41,6 +41,22 @@ class DataUser(Base):
                 self.last_phone, self.last_date
         )
 
+class Orders(Base):
+        __tablename__ = "phone_all_orders"
+
+        id = Column("id", Integer, primary_key=True)
+        user_id = Column("user_id", Integer)
+        created = Column("created", String)
+        service = Column("service", String)
+        price = Column("price", String)
+
+        def __repr__(self):
+                return "Order {0} {1} {2} {3} {4}".format(
+                        self.id, self.user_id, 
+                        self.created, self.service, 
+                        self.price
+                )
+
 engine = create_engine("sqlite:///database/data_bomber.db")
 Base.metadata.create_all(engine)
 session = Session(bind=engine)

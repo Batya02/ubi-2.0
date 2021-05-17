@@ -7,10 +7,12 @@ from aiogram.types import (
         InlineKeyboardButton)
 from aiogram.utils.exceptions import BotBlocked, UserDeactivated, ChatNotFound
 
-from db_models.User import User, session
+from db_models.User import session, User, Orders
 
 from datetime import datetime as dt
 from aiohttp import ClientSession
+import pandas as pd
+from io import BytesIO
 
 cfg = config.Config()
 
@@ -129,10 +131,18 @@ async def numbers_service(query: CallbackQuery):
                         text="Недостаточно средств на балансе!"
                 )
             else:
+                #UPDATE BALANCE
                 update_balance = session.query(User).filter_by(user_id=query.message.chat.id).first()
                 update_balance.balance = new_balance
                 session.commit()
-                
+
+                #CREATE NEW ORDER
+                create_new_order = Orders(
+                        user_id=query.message.chat.id, created=dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S"), 
+                        service = service_name, price = service_price)
+                session.add(create_new_order)
+                session.commit()
+            
             res = res.split(":")
             status_number = res[0]
             id_number = res[1]
@@ -154,8 +164,11 @@ async def numbers_service(query: CallbackQuery):
             )
 
             while True:
+
+                #GET ID ORDER
                 get_id = await client_session.get(f"http://{cfg.host_site_api}/stubs/handler_api.php?api_key={cfg.api_key}&action=getStatus&id={id_number}")
                 get_id = await get_id.text()
+
                 if get_id == "STATUS_WAIT_CODE":pass
                 elif get_id.startswith(("STATUS_OK")):
                     code = get_id.split(":")[1]
@@ -168,8 +181,43 @@ async def numbers_service(query: CallbackQuery):
 async def cancel_number(query: CallbackQuery):
     cancel_id_number = query.data.replace("_", " ").split()[1]
     async with ClientSession() as session:
+
+        #CANCEL ORDER
         res = await session.post(f"http://{cfg.host_site_api}/stubs/handler_api.php?api_key={cfg.api_key}&action=setStatus&status=-1&id={cancel_id_number}")
         res = await res.text()
+
         if res == "ACCESS_CANCEL":
             await query.answer(text="Номер успешно отменен.")
             await bot.delete_message(query.message.chat.id, query.message.message_id)
+
+@dp.callback_query_handler(lambda query: query.data.startswith(("phone_stat")))
+async def get_phone_stat(query: CallbackQuery):
+    user_id = query.data.split("_")[2]
+
+    data_orders = session.query(Orders).filter_by(user_id=user_id).all()
+    language = session.query(User.language).filter_by(user_id=user_id).first()[0]
+
+    if data_orders == []:
+        return await query.answer(
+                text= "У вас нет активированных номеров!" if language == "RU" else "You have no activated numbers!"
+        )
+    
+    columns = Orders.__table__.columns.keys()
+
+    all_data = []
+    all_data.append([id.id for id in data_orders])
+    all_data.append([created.created for created in data_orders])
+    all_data.append([service.service for service in data_orders])
+    all_data.append([price.price for price in data_orders])
+
+    columns.remove("user_id")
+
+    towrite = BytesIO()
+    data_dct = dict(zip(columns, all_data))
+    df = pd.DataFrame(data_dct)
+    df.to_excel(towrite)
+
+    await bot.send_document(
+        query.message.chat.id, 
+        document=("activation.xlsx",towrite.getvalue())
+    )
