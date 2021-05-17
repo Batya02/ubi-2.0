@@ -132,7 +132,6 @@ class Bomber:
                         await asyncio.sleep(1)
                     except:pass
 
-            self.circle+=1
             await asyncio.sleep(5)
 
     async def stop(self, chat_id):
