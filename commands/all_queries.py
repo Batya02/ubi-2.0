@@ -101,18 +101,6 @@ async def on_mailing(query: CallbackQuery):
 @dp.callback_query_handler(lambda query: query.data.startswith(("num")))
 async def numbers_service(query: CallbackQuery):
     service_name, service_price = query.data.replace("_", " ").split()[1:] #Service data (array)
-    
-    my_balance = float(session.query(User.balance).filter_by(user_id=query.message.chat.id).first()[0])
-    new_balance = my_balance - float(service_price)
-    if new_balance < 0:
-        return await bot.send_message(
-            query.message.chat.id, 
-            text="Недостаточно средств на балансе!"
-        )
-    else:
-        update_balance = session.query(User).filter_by(user_id=query.message.chat.id).first()
-        update_balance.balance = new_balance
-        session.commit()
 
     async with ClientSession() as client_session:
         res = await client_session.get(f"http://{cfg.host_site_api}/stubs/handler_api.php?api_key={cfg.api_key}&action=getNumber&service={service_name}&operator=any&country=russia")
@@ -133,6 +121,18 @@ async def numbers_service(query: CallbackQuery):
 
         #If all true
         else:
+            my_balance = float(session.query(User.balance).filter_by(user_id=query.message.chat.id).first()[0])
+            new_balance = my_balance - float(service_price)
+            if new_balance < 0:
+                return await bot.send_message(
+                        query.message.chat.id, 
+                        text="Недостаточно средств на балансе!"
+                )
+            else:
+                update_balance = session.query(User).filter_by(user_id=query.message.chat.id).first()
+                update_balance.balance = new_balance
+                session.commit()
+                
             res = res.split(":")
             status_number = res[0]
             id_number = res[1]
