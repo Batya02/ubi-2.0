@@ -120,7 +120,7 @@ async def take_phone(message: Message):
 
         #Update data (last phone and last date)
         update_data = session.query(DataUser).filter_by(user_id=message.from_user.id).first()
-
+        print(update_data)
         update_data.last_phone = phone
         update_data.last_date = dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S")
 
