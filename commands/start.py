@@ -35,6 +35,7 @@ async def start(message: Message):
                     f"🌐Выберите язык",
                     reply_markup=lang_usl
                     )
+                
 
     else:
         language = data_user.language
