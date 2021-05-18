@@ -18,7 +18,7 @@ class User(Base):
     balance = Column("balance", String)
 
     def __repr__(self):
-        return "<User {0} {1} {2} {3} {4} {5}".format(
+        return "<User {0} {1} {2} {3} {4} {5}>".format(
                 self.id, self.user_id, 
                 self.username, self.date_registration, 
                 self.language, self.balance,
@@ -35,7 +35,7 @@ class DataUser(Base):
     last_date = Column("last_date", String)
 
     def __repr__(self):
-        return "Data user {0} {1} {2} {3} {4} {5}".format(
+        return "<Data user {0} {1} {2} {3} {4} {5}>".format(
                 self.id, self.user_id, 
                 self.date, self.status, 
                 self.last_phone, self.last_date
@@ -51,7 +51,7 @@ class Orders(Base):
         price = Column("price", String)
 
         def __repr__(self):
-                return "Order {0} {1} {2} {3} {4}".format(
+                return "<Order {0} {1} {2} {3} {4}>".format(
                         self.id, self.user_id, 
                         self.created, self.service, 
                         self.price
