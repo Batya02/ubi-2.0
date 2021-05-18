@@ -5,3 +5,4 @@ Lib/
 Scripts/
 debug/
 pyvenv.cfg
+.vscode/
