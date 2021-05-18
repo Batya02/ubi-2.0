@@ -3,10 +3,8 @@ from datetime import datetime as dt
 
 import globals
 from sites import Bomber
-from globals import dp, conn
+from globals import dp
 from config import config
-
-from sqlalchemy import select
 
 from aiogram.types import Message
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
