@@ -6,3 +6,6 @@ Scripts/
 debug/
 pyvenv.cfg
 .vscode/
+lib/
+lib64/
+bin/
