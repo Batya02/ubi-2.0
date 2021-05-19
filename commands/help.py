@@ -1,4 +1,4 @@
-from globals import conn, dp
+from globals import dp
 from aiogram.types import Message
 
 from db_models.User import session, User

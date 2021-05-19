@@ -1,5 +1,3 @@
-import asyncio
-import sqlite3
 from config.config import Config
 from loguru import logger
 from aiogram import Bot
@@ -7,7 +5,7 @@ from db_models.User import engine
 from aiogram import Dispatcher
 from sites import Bomber
 
-#-_-_-_-_-CONNECTS-_-_-_-_-
+#-_-_-_-_-_-CONNECTS-_-_-_-_-_-#
 try:
     config = Config() #Config load
     logger.info("[+] True loaded configuration")
@@ -21,10 +19,9 @@ try:
 except Exception as e:
     logger.exception(e)
 
-conn = engine.connect()
-#-_-_-_-_-_-END-_-_-_-_-_-
+engine.connect()
 
-#-_-_-_-_-VARIABLES -_-_-_-_-
+#-_-_-_-_-_-VARIABLES -_-_-_-_-_-#
 username_bot:str = None #Username bot
 data_numbers_kv:dict = None #All public numbers
 
@@ -36,9 +33,10 @@ attack_country:str = None
 mail_button = None
 mail_content:str = None
 mail_count:int = 0
-#-_-_-_-_-_-END-_-_-_-_-_-
 
-#-_-_-_-_-KEYBOARDS-_-_-_-_-
+state_data:list = []
+
+#-_-_-_-_-_-KEYBOARDS-_-_-_-_-_-#
 ru_keyboards:list = [
     ["👤Мой профиль"], 
     ["💣Атаковать номер"],
@@ -51,4 +49,3 @@ eng_keyboards:list = [
     ["💣Attack number"], 
     ["🌐Change the language"]
 ]
-#-_-_-_-_-_-END-_-_-_-_-_-

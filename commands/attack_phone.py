@@ -1,5 +1,8 @@
 import re 
 from datetime import datetime as dt
+from asyncio import sleep
+
+from aiogram.utils.exceptions import InlineKeyboardExpected
 
 import globals
 from sites import Bomber
@@ -9,7 +12,9 @@ from config import config
 from aiogram.types import Message
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from db_models.User import session, DataUser
+from db_models.User import session, User, DataUser
+
+from payment.payment import Payment
 
 cfg = config.Config()
 
@@ -105,39 +110,86 @@ async def eng_attack_phone(message: Message):
          "📲Купить виртуальный номер"))
          )
 async def take_phone(message: Message):
-    if not message.chat.id in cfg.super_groups:
-        phone = re.sub("[^0-9]", "", message.text)
+    if not message.chat.id in cfg.super_groups:     #Not super groups
+        if globals.state_data != []:                #Not attack phone number
+            if globals.state_data[0] == "payment":  #If this is payment
+                try:
+                    qiwi_data = Payment(count=float(message.text)).create_invoice() #Create invoice and get data
 
-        if phone.startswith("7") or phone.startswith("8"):
-            phone = f"7{phone[1:]}"
-            globals.attack_country = "ru"
+                    r_url = qiwi_data["payUrl"]     #Url for payment
+                    billId = qiwi_data["billId"]    #Id payment
+                    user_id = globals.state_data[1] #User id 
 
-        elif phone.startswith("38") or phone.startswith("+38"):
-            arr_phone = phone.split("0")[1]
-            phone = f"38{arr_phone}"
-            globals.attack_country = "uk"
-            
+                    continue_payment = InlineKeyboardMarkup(
+                        inline_keyboard = [
+                            [InlineKeyboardButton(text="Продолжить оплату", url=r_url)]
+                        ]
+                    )
+                    await message.answer(
+                        text="Нажмите кнопоку для продолжения оплаты", 
+                        reply_markup=continue_payment
+                    )
+
+                    globals.state_data = [] #Reset array (qiwi data)
+
+                    while True:
+                        value_status = Payment(count=None).check_payment(last_id=billId)["status"]["value"] #Get payment status
+
+                        await sleep(2) #Time-out 
+
+                        if value_status == "WAITING":pass
+                        elif value_status == "PAID":
+                            #Update balance, insert new amount 
+                            update_balance = session.query(User).filter_by(user_id=user_id).first()
+                            update_balance.balance = float(update_balance.balance) + float(message.text)
+                            session.commit()
+
+                            await message.answer(f"✅ Баланс успешно пополнен на {float(message.text)}₽")
+                            break
+                    
+                except ValueError:await message.answer("Нужно вводить число!")
         else:
-            return await message.answer("🔁Не удалось определить страну. Проверьте номер на корректность!", reply=True)
-
-        #Update data (last phone and last date)
-        update_data = session.query(DataUser).filter_by(user_id=message.from_user.id).first()
-        
-        update_data.last_phone = phone
-        update_data.last_date = dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S")
-
-        session.commit()
-
-        usl = InlineKeyboardMarkup(
-                inline_keyboard = [
-                        [InlineKeyboardButton(
-                                text="⏹Остановить", callback_data=f"Остановить_{message.from_user.id}")]
-                ])
-
-        await message.answer(
-                text="▶️Атака началась!\nНажмите кнопку для остановки атаки.", 
-                reply_markup = usl
+            if not message.text.isdigit():
+                return await message.answer(
+                    text="Должны присутствовать только цифры!"
                 )
 
-        globals.start_attack = Bomber(user_id=str(message.from_user.id))
-        await globals.start_attack.start(message.text, message.from_user.id)
+            phone = re.sub("[^0-9]", "", message.text) #Only digital value
+
+            if phone.startswith("7") or phone.startswith("8"): #Russia country
+                #Phone format
+                phone = f"7{phone[1:]}"
+
+                globals.attack_country = "ru" #Set country name for attack
+
+            elif phone.startswith("38"): #Ukraine country
+                #Phone format
+                arr_phone = phone.split("0")[1]
+                phone = f"38{arr_phone}"
+
+                globals.attack_country = "uk" #Set country name for attack
+            
+            else: #Unknow country or wrong value
+                return await message.answer("🔁Не удалось определить страну. Проверьте номер на корректность!", reply=True)
+
+            #Update data (last phone and last date)
+            update_data = session.query(DataUser).filter_by(user_id=message.from_user.id).first()
+            
+            update_data.last_phone = phone
+            update_data.last_date = dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S")
+
+            session.commit()
+
+            usl = InlineKeyboardMarkup(
+                    inline_keyboard = [
+                            [InlineKeyboardButton(
+                                    text="⏹Остановить", callback_data=f"Остановить_{message.from_user.id}")]
+                    ])
+
+            await message.answer(
+                    text="▶️Атака началась!\nНажмите кнопку для остановки атаки.", 
+                    reply_markup = usl
+                    )
+
+            globals.start_attack = Bomber(user_id=str(message.from_user.id))
+            await globals.start_attack.start(message.text, message.from_user.id)

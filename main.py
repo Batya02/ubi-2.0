@@ -21,9 +21,9 @@ async def main():
             statistics, start, 
             my_profile, admin, 
             send_message, change_language, 
-            all_queries, help, 
-            attack_phone, mailing,
-            get_numbers
+            help, mailing, 
+            get_numbers, attack_phone, 
+            all_queries
             )
 
     from commands.currency import (

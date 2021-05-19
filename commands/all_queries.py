@@ -1,6 +1,6 @@
 import globals
 from config import config
-from globals import dp, bot, conn, eng_keyboards, ru_keyboards
+from globals import dp, bot, eng_keyboards, ru_keyboards
 from aiogram.types import (
         CallbackQuery, ReplyKeyboardMarkup, 
         InlineKeyboardMarkup, InlineKeyboardButton)
@@ -220,3 +220,12 @@ async def get_phone_stat(query: CallbackQuery):
         query.message.chat.id, 
         document=("activation.xlsx",towrite.getvalue())
     )
+
+@dp.callback_query_handler(lambda query: query.data.startswith(("payment")))
+async def payment(query: CallbackQuery):
+    globals.state_data = query.data.split("_")
+    await bot.edit_message_text(
+                chat_id = query.message.chat.id, 
+                message_id = query.message.message_id, 
+                text =  "Введите сумму для пополнения:"
+                )

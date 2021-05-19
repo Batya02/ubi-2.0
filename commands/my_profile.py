@@ -11,7 +11,8 @@ async def my_profile_ru(message: Message):
 
     get_phones_stat = InlineKeyboardMarkup(
         inline_keyboard= [
-            [InlineKeyboardButton(text="Вывести историю активаций(xlsx)", callback_data=f"phone_stat_{message.chat.id}")]
+            [InlineKeyboardButton(text="Вывести историю активаций(xlsx)", callback_data=f"phone_stat_{message.chat.id}")], 
+            [InlineKeyboardButton(text="Пополнить счёт", callback_data=f"payment_{message.chat.id}")]
         ]
     )
 
@@ -19,7 +20,7 @@ async def my_profile_ru(message: Message):
             text=f"🌐<b>Язык:</b> {profile_data.language}\n\n"
             f"📍<b>User ID:</b> {profile_data.user_id}\n\n"
             f"📅<b>Дата регистрации:</b> <i>{profile_data.date_registration}</i>\n\n"
-            f"💰<b>Баланс:</b> <code>{float(profile_data.balance)}</code>", 
+            f"💰<b>Баланс:</b> <code>{float(profile_data.balance)}₽</code>", 
             reply_markup=get_phones_stat
             )
 
@@ -38,6 +39,6 @@ async def my_profile_eng(message: Message):
             text=f"🌐<b>Language:</b> {profile_data.language}\n\n"
             f"📍<b>User ID:</b> {profile_data.user_id}\n\n"
             f"📅<b>Date registration:</b> <i>{profile_data.date_registration}</i>\n\n"
-            f"💰<b>Balance:</b> <code>{float(profile_data.balance)}</code>",
+            f"💰<b>Balance:</b> <code>{float(profile_data.balance)}₽</code>",
             reply_markup=get_phones_stat
             )
