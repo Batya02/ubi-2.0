@@ -34,6 +34,7 @@ async def ru_attack_phone(message: Message):
                 status=30, last_phone="None", 
                 last_date="None"
         )
+        session.add(user_data)
         session.commit()
 
         await message.answer(
@@ -75,6 +76,7 @@ async def eng_attack_phone(message: Message):
                 status=30, last_phone="None", 
                 last_date="None"
         )
+        session.add(user_data)
         session.commit()
 
         await message.answer(
