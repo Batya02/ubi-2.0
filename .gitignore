@@ -9,3 +9,5 @@ pyvenv.cfg
 lib/
 lib64/
 bin/
+share/
+share/
