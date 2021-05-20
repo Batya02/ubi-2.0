@@ -9,7 +9,7 @@ from config import config
 
 cfg = config.Config()
 
-DateTime = dt.now(tz=tzlocal()) + timedelta(minutes=15)
+DateTime = dt.now(tz=tzlocal()) + timedelta(hours=7,minutes=15)
 DT = DateTime.strftime("%Y-%m-%dT%H:%M:%S+03:00")
 
 class Payment:
