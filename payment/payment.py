@@ -12,6 +12,8 @@ cfg = config.Config()
 DateTime = dt.now(tz=tzlocal()) + timedelta(minutes=15)
 DT = DateTime.strftime("%Y-%m-%dT%H:%M:%S+03:00")
 
+print(DT)
+
 class Payment:
     headers:dict
     params:dict
