@@ -115,7 +115,7 @@ async def take_phone(message: Message):
             if globals.state_data[0] == "payment":  #If this is payment
                 try:
                     qiwi_data = Payment(count=float(message.text)).create_invoice() #Create invoice and get data
-                    print(qiwi_data)
+
                     r_url = qiwi_data["payUrl"]     #Url for payment
                     billId = qiwi_data["billId"]    #Id payment
                     user_id = globals.state_data[1] #User id 
@@ -148,6 +148,7 @@ async def take_phone(message: Message):
                             break
                     
                 except ValueError:await message.answer("Нужно вводить число!")
+                except KeyError:pass
         else:
             if not message.text.isdigit():
                 return await message.answer(
