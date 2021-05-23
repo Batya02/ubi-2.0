@@ -155,10 +155,8 @@ async def take_phone(message: Message):
                 except ValueError:await message.answer("Нужно вводить число!")
                 except KeyError:pass
         else:
-            if not message.text.isdigit():
-                return await message.answer(
-                    text="Должны присутствовать только цифры!"
-                )
+            
+            if message.text.isalpha() and message.text.isdigit():pass
 
             phone = re.sub("[^0-9]", "", message.text) #Only digital value
 
