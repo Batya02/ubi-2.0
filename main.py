@@ -14,7 +14,6 @@ globals.dp = Dispatcher(globals.bot, storage=MemoryStorage())
 
 send_mess_PATH = os.getcwd()  #Main path
 
-
 async def main():
     
     from commands import (

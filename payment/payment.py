@@ -1,5 +1,7 @@
 import requests 
+from requests.exceptions import ConnectionError
 import random
+from loguru import logger
 
 from datetime import datetime as dt
 from datetime import timedelta
@@ -22,7 +24,8 @@ class Payment:
         self.headers = {
                 "Authorization":f"Bearer {cfg.qiwi_private_key}", 
                 "Content-Type":"application/json", 
-                "Accept":"application/json"
+                "Accept":"application/json", 
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36"
                 }
 
         self.params = { 
@@ -51,7 +54,9 @@ class Payment:
         return r"https://api.qiwi.com/partner/bill/v1/bills/%s" % self.generate_id()
     
     def create_invoice(self) -> dict:
-        return requests.put(url=self.create_url(), json=self.params, headers=self.headers).json()
+        try:
+            return requests.put(url=self.create_url(), json=self.params, headers=self.headers, timeout=5).json()
+        except ConnectionError:return False
 
     def check_payment(self, last_id=None) -> dict:
         return requests.get(url="https://api.qiwi.com/partner/bill/v1/bills/%s" % last_id, headers=self.check_headers).json()

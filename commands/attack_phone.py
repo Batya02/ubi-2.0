@@ -113,8 +113,13 @@ async def take_phone(message: Message):
     if not message.chat.id in cfg.super_groups:     #Not super groups
         if globals.state_data != []:                #Not attack phone number
             if globals.state_data[0] == "payment":  #If this is payment
-                try:
+
+                try:                   
                     qiwi_data = Payment(count=float(message.text)).create_invoice() #Create invoice and get data
+
+                    if not qiwi_data:
+                        globals.state_data = [] #Reset array (qiwi data)
+                        return await message.answer("Error")
 
                     r_url = qiwi_data["payUrl"]     #Url for payment
                     billId = qiwi_data["billId"]    #Id payment
