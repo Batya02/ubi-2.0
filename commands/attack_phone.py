@@ -156,7 +156,7 @@ async def take_phone(message: Message):
                 except KeyError:pass
         else:
             
-            if message.text.isalpha() and message.text.isdigit():pass
+            if message.text.isalpha() and message.text.isdigit():return False
 
             phone = re.sub("[^0-9]", "", message.text) #Only digital value
 
