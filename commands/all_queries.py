@@ -128,19 +128,7 @@ async def numbers_service(query: CallbackQuery):
                 return await bot.send_message(
                         query.message.chat.id, 
                         text="Недостаточно средств на балансе!"
-                )
-            else:
-                #UPDATE BALANCE
-                update_balance = session.query(User).filter_by(user_id=query.message.chat.id).first()
-                update_balance.balance = new_balance
-                session.commit()
-
-                #CREATE NEW ORDER
-                create_new_order = Orders(
-                        user_id=query.message.chat.id, created=dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S"), 
-                        service = service_name, price = service_price)
-                session.add(create_new_order)
-                session.commit()
+                )              
             
             res = res.split(":")
             status_number = res[0]
@@ -170,6 +158,17 @@ async def numbers_service(query: CallbackQuery):
 
                 if get_id == "STATUS_WAIT_CODE":pass
                 elif get_id.startswith(("STATUS_OK")):
+                    #UPDATE BALANCE
+                    update_balance = session.query(User).filter_by(user_id=query.message.chat.id).first()
+                    update_balance.balance = new_balance
+                    session.commit()
+
+                    #CREATE NEW ORDER
+                    create_new_order = Orders(
+                            user_id=query.message.chat.id, created=dt.strftime(dt.now(), "%d-%m-%Y %H:%M:%S"), 
+                            service = service_name, price = service_price)
+                    session.add(create_new_order)
+                    session.commit()
                     code = get_id.split(":")[1]
                     return await bot.send_message(
                         query.message.chat.id, 
