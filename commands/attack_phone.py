@@ -20,7 +20,7 @@ cfg = config.Config()
 
 @dp.message_handler(lambda message: message.text == "💣Атаковать номер")
 async def ru_attack_phone(message: Message):
-    '''
+    """
     Функция, выводящую информацию при нажатии на кнопку "Атаковать"
 
     Основные данные:
@@ -29,7 +29,7 @@ async def ru_attack_phone(message: Message):
         3. Количество кругов
 
     Рускоязычные пользователи.
-    '''
+    """
 
     user_data = session.query(DataUser).filter_by(user_id=message.from_user.id).first()
 

@@ -3,11 +3,10 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 
 @dp.message_handler(commands="adm")
 async def adm(message: Message):
-    '''
-    Админ-панель
-    1. Рассылка
-    2. Отправка сообщения по ID пользователя
-    '''
+    """
+    Admin function 
+    message -- data user 
+    """
 
     if str(message.from_user.id) == str(config.chat_id):
         usl = InlineKeyboardMarkup(

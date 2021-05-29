@@ -7,10 +7,14 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 cfg = config.Config()
 
 @dp.message_handler(lambda message: message.text=="📲Купить виртуальный номер")
-async def get_numbers_list(message: Message):   
+async def get_numbers_list(message: Message): 
+    """Return count services
+
+    data_numbers -- type dict
+    """  
     async with ClientSession() as session:
         data_numbers = await session.get(f"https://{cfg.host_site_main}/v1/guest/products/russia/any")
-        data_numbers = json.loads(await data_numbers.text())
+        data_numbers:dict = json.loads(await data_numbers.text())
         await session.close()
 
         data_numbers_values = [data_numbers["telegram"], data_numbers["vkontakte"], data_numbers["whatsapp"]]
@@ -29,7 +33,7 @@ async def get_numbers_list(message: Message):
             ]
         )
 
-        await message.answer(
+        return await message.answer(
             text="🇷🇺Выберите сервис👇", 
             reply_markup=numbers_markup
         )        

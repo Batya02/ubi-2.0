@@ -3,12 +3,12 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 @dp.message_handler(lambda message: message.text == "🌐Изменить язык" or message.text == "🌐Change the language")
 async def ru_send_message(message: Message):
-    '''
+    """
     Функция изменения языка
     Дается выбор: 
         1. Английский(ENG)
         2. Русский(RUS)
-    '''
+    """
 
     change_language_usl = InlineKeyboardMarkup(
         inline_keyboard = [
